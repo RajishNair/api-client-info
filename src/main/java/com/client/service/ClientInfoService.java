@@ -1,15 +1,16 @@
 package com.client.service;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
-import com.client.clientinfo.exception.ResourceNotFoundException;
+import com.client.clientinfo.util.IDNumberData;
+import com.client.clientinfo.util.IDNumberParser;
 import com.client.data.ClientInfo;
 
 @Service
@@ -44,50 +45,42 @@ public class ClientInfoService {
 			 isValid = validateData(clientInfo.getIdNumber(),clientInfo.getPhoneNumber());
 		if(isValid) {
 			List<ClientInfo> updatedList = clientInfoList.stream().filter(e -> idNumber.equals(e.getIdNumber())).toList();
-			clientInfoList.remove(updatedList);
-			clientInfoList.add(clientInfo);
-			return clientInfo;
+			ClientInfo clientInfoUpdated = updatedList.get(0);
+			clientInfoList.remove(updatedList.get(0));
+			if(Optional.ofNullable(clientInfo.getFirstName()).isPresent())
+				clientInfoUpdated.setFirstName(clientInfo.getFirstName());
+			if(Optional.ofNullable(clientInfo.getAddress()).isPresent())
+				clientInfoUpdated.setAddress(clientInfo.getAddress());
+			if(Optional.ofNullable(clientInfo.getIdNumber()).isPresent())
+				clientInfoUpdated.setIdNumber(clientInfo.getIdNumber());
+			if(Optional.ofNullable(clientInfo.getPhoneNumber()).isPresent())
+				clientInfoUpdated.setPhoneNumber(clientInfo.getPhoneNumber());
+			if(Optional.ofNullable(clientInfo.getLastName()).isPresent())
+				clientInfoUpdated.setLastName(clientInfo.getLastName());
+			
+			clientInfoList.add(clientInfoUpdated);
+			return clientInfoUpdated;
 		}
 		return null;
 	}
 	
 	private boolean validateData(String idNumber, String phoneNumber) {
-		boolean isValid = true;
-		String regExpression = "([0-9][0-9])((?:[0][1-9])|(?:[1][0-2]))((?:[0-2][0-9])|(?:[3][0-1]))([0-9])([0-9]{3})([0-9])([0-9])([0-9])"; 
-        Pattern pattern = Pattern.compile(regExpression);
+		IDNumberParser idNumberParser = new IDNumberParser();
+		IDNumberData idNumberData =null;;
+		try {
+			idNumberData = idNumberParser.parse(idNumber);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        Matcher matcher = pattern.matcher(idNumber);
-
-        if (matcher.matches()) {
-
-            int tot1 = 0;
-            for (int i = 0; i < idNumber.length() - 1; i += 2) {
-                tot1 = tot1 + Integer.parseInt(idNumber.substring(i, i + 1));
-            }
-
-            StringBuffer field1 = new StringBuffer("");
-            for (int i = 1; i < idNumber.length(); i += 2) {
-                field1.append(idNumber.substring(i, i + 1));
-            }
-
-            String evenTotStr = (Long.parseLong(field1.toString()) * 2) + "";
-            int tot2 = 0;
-            for (int i = 0; i < evenTotStr.length(); i++) {
-                tot2 = tot2 + Integer.parseInt(evenTotStr.substring(i, i + 1));
-            }
-
-            int lastD = (10 - ((tot1 + tot2) % 10)) % 10;
-            int checkD = Integer.parseInt(idNumber.substring(12, 13));
-
-            if (checkD == lastD) {
-            	isValid = true;
-                return isValid;
-            } else {
-                return isValid;
-            }
-        } else {
-            return isValid;
-        }
+		System.out.println("isValid: " + idNumberData.isValid());
+		System.out.println("Date Of Birth: " + idNumberData.getBirthdate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)));
+		System.out.println("Age: " + idNumberData.getAge());
+		System.out.println("Gender: " + idNumberData.getGender());
+		System.out.println("Citizenship: " + idNumberData.getCitizenShip());
+		if(Optional.ofNullable(idNumberData).isPresent())
+			return idNumberData.isValid();
+		return Boolean.FALSE;
 	}
 
 }

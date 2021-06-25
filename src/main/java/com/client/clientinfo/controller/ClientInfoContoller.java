@@ -58,7 +58,7 @@ public class ClientInfoContoller {
 				@Valid @RequestBody ClientInfo clientInfo) throws ResourceNotFoundException {
 			ClientInfo clientInfoNew = clientService.updateClientDetails(idNumber,clientInfo);
 			if(null!= clientInfoNew)
-				return ResponseEntity.ok(clientService.addClient(clientInfo));
+				return ResponseEntity.ok(clientInfoNew);
 			throw new ResourceNotFoundException(
 					"Client already exists for idNumber or phoneNumber: "+clientInfo.getIdNumber()+" - "+clientInfo.getPhoneNumber());
 			
