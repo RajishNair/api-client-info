@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.client.clientinfo.exception.ResourceNotFoundException;
 import com.client.clientinfo.util.IDNumberData;
 import com.client.clientinfo.util.IDNumberParser;
 import com.client.data.ClientInfo;
@@ -28,7 +29,7 @@ public class ClientInfoService {
 		return clientInfoList;
 	}
 	
-	public ClientInfo addClient(ClientInfo clientInfo) {
+	public ClientInfo addClient(ClientInfo clientInfo) throws ResourceNotFoundException {
 		boolean isValid = false;
 		if(Optional.ofNullable(clientInfo.getIdNumber()).isPresent() && Optional.ofNullable(clientInfo.getPhoneNumber()).isPresent())
 			 isValid = validateData(clientInfo.getIdNumber(),clientInfo.getPhoneNumber());
@@ -39,7 +40,7 @@ public class ClientInfoService {
 		return null;
 	}
 	
-	public ClientInfo updateClientDetails(String idNumber, ClientInfo clientInfo) {
+	public ClientInfo updateClientDetails(String idNumber, ClientInfo clientInfo) throws ResourceNotFoundException {
 		boolean isValid = false;
 		if(Optional.ofNullable(clientInfo.getIdNumber()).isPresent() && Optional.ofNullable(clientInfo.getPhoneNumber()).isPresent())
 			 isValid = validateData(clientInfo.getIdNumber(),clientInfo.getPhoneNumber());
@@ -62,15 +63,16 @@ public class ClientInfoService {
 			return clientInfoUpdated;
 		}
 		return null;
+		
 	}
 	
-	private boolean validateData(String idNumber, String phoneNumber) {
+	private boolean validateData(String idNumber, String phoneNumber) throws ResourceNotFoundException {
 		IDNumberParser idNumberParser = new IDNumberParser();
 		IDNumberData idNumberData =null;;
 		try {
 			idNumberData = idNumberParser.parse(idNumber);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ResourceNotFoundException("Invalid ID Number with - "+ e.getMessage());
 		}
 
 		System.out.println("isValid: " + idNumberData.isValid());
@@ -79,7 +81,7 @@ public class ClientInfoService {
 		System.out.println("Gender: " + idNumberData.getGender());
 		System.out.println("Citizenship: " + idNumberData.getCitizenShip());
 		if(Optional.ofNullable(idNumberData).isPresent())
-			return idNumberData.isValid();
+			return idNumberData.isValid() ? true : false;
 		return Boolean.FALSE;
 	}
 
