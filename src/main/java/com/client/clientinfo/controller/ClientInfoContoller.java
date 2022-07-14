@@ -3,11 +3,10 @@ package com.client.clientinfo.controller;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +44,7 @@ public class ClientInfoContoller {
 
 		
 		@PostMapping("/client/addClientInfo")
-		public ResponseEntity<ClientInfo> createEmployee(@Valid @RequestBody ClientInfo clientInfo) throws ResourceNotFoundException{
+		public ResponseEntity<ClientInfo> createEmployee(@Validated @RequestBody ClientInfo clientInfo) throws ResourceNotFoundException{
 			ClientInfo clientInfoNew = clientService.addClient(clientInfo);
 			if(null!= clientInfoNew)
 				return ResponseEntity.ok(clientService.addClient(clientInfo));
@@ -55,7 +54,7 @@ public class ClientInfoContoller {
 		
 		@PutMapping("/client/updateClientInfo/{idNumber}")
 		public ResponseEntity<ClientInfo> updateEmployee(@PathVariable(value = "idNumber") String idNumber,
-				@Valid @RequestBody ClientInfo clientInfo) throws ResourceNotFoundException {
+				@Validated @RequestBody ClientInfo clientInfo) throws ResourceNotFoundException {
 			ClientInfo clientInfoNew = clientService.updateClientDetails(idNumber,clientInfo);
 			if(null!= clientInfoNew)
 				return ResponseEntity.ok(clientInfoNew);

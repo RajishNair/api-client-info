@@ -1,21 +1,11 @@
 package com.client.data;
 
-import javax.validation.constraints.Size;
-
 import java.util.Objects;
-
-import javax.validation.constraints.NotNull;
-
 
 public class ClientInfo {
 	
-	@NotNull
-	@Size(min = 13, message = "ID Number should have atleast 13 digits")
 	private String idNumber;
-	@NotNull
 	private String firstName;
-	@NotNull
-	@Size(min = 10, message = "Phone Number should have atleast 10 digits")
 	private String phoneNumber;
 	private String lastName;
 	private String address;
